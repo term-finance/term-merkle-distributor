@@ -21,7 +21,7 @@
     "precompile": "rimraf ./build/",
     "compile": "npx hardhat compile",
     "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
-    "generate-merkle-root:sepolia": "ts-node scripts/generate-merkle-root.ts --input input_lists/sepolia.json",
+    "generate-merkle-root:sepolia": "hardhat generate-merkle-root --input input_lists/sepolia.json --deploy --network sepolia",
     "prepublishOnly": "yarn test",
     "pretest": "yarn compile",
     "test": "npx hardhat test"
