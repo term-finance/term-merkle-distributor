@@ -51,7 +51,6 @@ jobs:
           echo "Deployed contract:" >> $GITHUB_STEP_SUMMARY
         env:
           OUTPUT_DEPLOY_ENV: term-deploy.env
-          TOKEN_ADDRESS: ${{ github.event.inputs.TOKEN_ADDRESS }}
       - uses: actions/upload-artifact@v4.6.1
         with:
           name: abis
