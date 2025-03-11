@@ -1,0 +1,62 @@
+name: "[sepolia-manual]: Deploy Merkle Distributor"
+on:
+  workflow_dispatch:
+    inputs:
+      tokenAddress:
+        description: "Air drop token Address"
+        required: true
+
+jobs:
+  deploy-config:
+    runs-on: ubuntu-latest
+    environment:
+      name: sepolia
+      url: https://term-finance.github.io/term-finance-ops-contracts/
+    steps:
+      - run: |
+          echo "SEPOLIA_RPC=\"${{ secrets.SEPOLIA_RPC }}\"" >> sepolia.env
+          echo "DEPLOYER_WALLET=\"${{ secrets.DEPLOYER_WALLET }}\"" >> sepolia.env
+          echo "TOKEN_ADDRESS=\"${{ github.event.inputs.tokenAddress }}\"" >> sepolia.env
+
+      - uses: actions/upload-artifact@v4.6.1
+        with:
+          name: deploy-sepolia.env
+          path: sepolia.env
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: sepolia
+      url: https://term-finance.github.io/term-finance-ops-contracts/
+    needs: deploy-config
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.17"
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn compile
+      - uses: actions/download-artifact@v4.1.9
+        with:
+          name: deploy-sepolia.env
+          path: /tmp/deploy-sepolia.env
+      - run: mv /tmp/deploy-sepolia.env/sepolia.env sepolia.env
+
+      - run: |
+          yarn generate-merkle-root:sepolia
+          echo "Deployed contract using:" >> $GITHUB_STEP_SUMMARY
+          cat "sepolia.env" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed contract:" >> $GITHUB_STEP_SUMMARY
+        env:
+          OUTPUT_DEPLOY_ENV: term-deploy.env
+          TOKEN_ADDRESS: ${{ github.event.inputs.TOKEN_ADDRESS }}
+      - uses: actions/upload-artifact@v4.6.1
+        with:
+          name: abis
+          path: abi/
+      - uses: actions/upload-artifact@v4.6.1
+        with:
+          name: deployed-sepolia.env
+          path: term-deploy.env
