@@ -1,12 +1,12 @@
 import { program } from 'commander'
 import fs from 'fs'
 import { parseBalanceMap } from '../src/parse-balance-map'
-import { ethers } from 'hardhat';
+import hre from 'hardhat';
 
 async function deployMerkleDistributor(merkleRoot: string) {
   const airdropAsset = process.env.AIRDROP_ASSET;
 
-  const MerkleDistributor = await ethers.getContractFactory('MerkleDistributor')
+  const MerkleDistributor = await hre.ethers.getContractFactory('MerkleDistributor')
   const merkleDistributor = await MerkleDistributor.deploy(
     // USDC
     airdropAsset,
