@@ -14,8 +14,8 @@ jobs:
       url: https://term-finance.github.io/term-merkle-distributor/
     steps:
       - run: |
-          echo "SEPOLIA_RPC_URL=\"${{ secrets.SEPOLIA_RPC }}\"" >> sepolia.env
-          echo "DEPLOYER_WALLET=\"${{ secrets.DEPLOYER_WALLET }}\"" >> sepolia.env
+          echo "SEPOLIA_RPC_URL=\"${{ secrets.SEPOLIA_RPC_URL }}\"" >> sepolia.env
+          echo "PRIVATE_KEY=\"${{ secrets.PRIVATE_KEY }}\"" >> sepolia.env
           echo "AIRDROP_ASSET=\"${{ github.event.inputs.tokenAddress }}\"" >> sepolia.env
 
       - uses: actions/upload-artifact@v4.6.1
