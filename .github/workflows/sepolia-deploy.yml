@@ -14,7 +14,7 @@ jobs:
       url: https://term-finance.github.io/term-merkle-distributor/
     steps:
       - run: |
-          echo "SEPOLIA_RPC=\"${{ secrets.SEPOLIA_RPC }}\"" >> sepolia.env
+          echo "SEPOLIA_RPC_URL=\"${{ secrets.SEPOLIA_RPC }}\"" >> sepolia.env
           echo "DEPLOYER_WALLET=\"${{ secrets.DEPLOYER_WALLET }}\"" >> sepolia.env
           echo "TOKEN_ADDRESS=\"${{ github.event.inputs.tokenAddress }}\"" >> sepolia.env
 
