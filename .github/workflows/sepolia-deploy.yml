@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: sepolia
-      url: https://term-finance.github.io/term-finance-ops-contracts/
+      url: https://term-finance.github.io/term-merkle-distributor/
     steps:
       - run: |
           echo "SEPOLIA_RPC=\"${{ secrets.SEPOLIA_RPC }}\"" >> sepolia.env
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: sepolia
-      url: https://term-finance.github.io/term-finance-ops-contracts/
+      url: https://term-finance.github.io/term-merkle-distributor/
     needs: deploy-config
 
     steps:
@@ -44,7 +44,7 @@ jobs:
       - run: mv /tmp/deploy-sepolia.env/sepolia.env sepolia.env
 
       - run: |
-          yarn generate-merkle-root:sepolia
+          yarn deploy-merkle-root:sepolia
           echo "Deployed contract using:" >> $GITHUB_STEP_SUMMARY
           cat "sepolia.env" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
