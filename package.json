@@ -21,13 +21,14 @@
     "precompile": "rimraf ./build/",
     "compile": "npx hardhat compile",
     "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
-    "generate-merkle-root:sepolia": "hardhat generate-merkle-root --input input_lists/sepolia.json --deploy --network sepolia",
+    "generate-merkle-root:sepolia": "env-cmd -f sepolia.env hardhat run scripts/generate-merkle-root.ts -- --input input_lists/sepolia.json",
     "prepublishOnly": "yarn test",
     "pretest": "yarn compile",
     "test": "npx hardhat test"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "4.7.0"
+    "@openzeppelin/contracts": "4.7.0",
+    "env-cmd": "^10.1.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",

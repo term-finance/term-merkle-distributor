@@ -4,8 +4,6 @@
 require('dotenv').config()
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import "./scripts/generate-merkle-root";
-
 
 module.exports = {
   solidity: {
