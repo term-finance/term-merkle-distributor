@@ -39,21 +39,35 @@ async function main() {
       console.error('AIRDROP_ASSET environment variable must be set for deployment');
       return process.exit(1);
     }
+    const endTimestamp = process.env.END_TIMESTAMP;
+    if (!endTimestamp) {
+      console.error('END_TIMESTAMP environment variable must be set for deployment');
+      return process.exit(1);
+    }
+
+    const adminAddress = process.env.ADMIN_ADDRESS;
+    if (!adminAddress) {
+      console.error('ADMIN_ADDRESS environment variable must be set for deployment');
+      return process.exit(1);
+    }
     
     console.log(`Deploying MerkleDistributor with token ${airdropAsset}...`);
     
     const [deployer] = await ethers.getSigners();
     console.log(`Deploying with account: ${deployer.address}`);
     
-    const MerkleDistributor = await ethers.getContractFactory('MerkleDistributor');
+    const MerkleDistributor = await ethers.getContractFactory('MerkleDistributorWithDeadline');
     const merkleDistributor = await MerkleDistributor.deploy(
       airdropAsset,
-      parsedBalances.merkleRoot
+      parsedBalances.merkleRoot,
+      endTimestamp,
     );
     
     console.log('Waiting for deployment transaction...');
     await merkleDistributor.deployed();
     console.log(`MerkleDistributor deployed at ${merkleDistributor.address}`);
+    await merkleDistributor.transferOwnership(adminAddress);
+    console.log(`Ownership transferred to ${adminAddress}`);
     
     // Save deployment information
     const deploymentInfo = {
