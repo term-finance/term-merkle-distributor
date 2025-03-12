@@ -22,7 +22,10 @@
     "compile": "npx hardhat compile",
     "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
     "generate-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",
-    "deploy-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json DEPLOY=true env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",    "prepublishOnly": "yarn test",
+    "deploy-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json DEPLOY=true env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",    
+    "generate-merkle-root:mainnet": "INPUT_FILE=input_lists/mainnet.json env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
+    "deploy-merkle-root:mainnet": "INPUT_FILE=input_lists/mainnet.json DEPLOY=true env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
+    "prepublishOnly": "yarn test",
     "pretest": "yarn compile",
     "test": "npx hardhat test"
   },
