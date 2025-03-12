@@ -16,7 +16,7 @@ jobs:
       - run: |
           echo "SEPOLIA_RPC_URL=\"${{ secrets.SEPOLIA_RPC }}\"" >> sepolia.env
           echo "DEPLOYER_WALLET=\"${{ secrets.DEPLOYER_WALLET }}\"" >> sepolia.env
-          echo "TOKEN_ADDRESS=\"${{ github.event.inputs.tokenAddress }}\"" >> sepolia.env
+          echo "AIRDROP_ASSET=\"${{ github.event.inputs.tokenAddress }}\"" >> sepolia.env
 
       - uses: actions/upload-artifact@v4.6.1
         with:
