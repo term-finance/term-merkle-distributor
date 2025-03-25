@@ -6,7 +6,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 // Get arguments from environment variables instead of command line
 const INPUT_FILE = process.env.INPUT_FILE;
-const DEPLOY = process.env.DEPLOY === 'true';
+const DEPLOY = false;
 
 // S3 configuration
 const S3_BUCKET = process.env.S3_BUCKET;
