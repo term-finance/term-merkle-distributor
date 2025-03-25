@@ -6,7 +6,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 // Get arguments from environment variables instead of command line
 const INPUT_FILE = process.env.INPUT_FILE;
-const DEPLOY = false;
+const DEPLOY = process.env.DEPLOY === 'true';
 
 // S3 configuration
 const S3_BUCKET = process.env.S3_BUCKET;
@@ -127,16 +127,6 @@ async function main() {
       deploymentInfo, 
       `merkle-deployments/${deploymentFileName}`
     );
-    
-    // Save locally if needed
-    if (process.env.SAVE_LOCAL === 'true') {
-      const deploymentPath = path.join(
-        path.dirname(INPUT_FILE), 
-        deploymentFileName
-      );
-      fs.writeFileSync(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
-      console.log(`Deployment information saved locally to ${deploymentPath}`);
-    }
   }
 }
 
