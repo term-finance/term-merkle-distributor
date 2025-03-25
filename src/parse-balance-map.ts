@@ -70,7 +70,7 @@ export function parseBalanceMap(balances: OldFormat | NewFormat[]): MerkleDistri
     [address: string]: { amount: string; index: number; proof: string[]; flags?: { [flag: string]: boolean } }
   }>((memo, address, index) => {
     const { amount, flags } = dataByAddress[address]
-    memo[address] = {
+    memo[address.toLowerCase()] = {
       index,
       amount: amount.toHexString(),
       proof: tree.getProof(index, address, amount),
