@@ -22,7 +22,7 @@
     "compile": "npx hardhat compile",
     "generate-merkle-root": "ts-node scripts/generate-merkle-root.ts",
     "generate-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",
-    "deploy-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json DEPLOY=true env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",    
+    "deploy-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json DEPLOY=true env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",
     "generate-merkle-root:mainnet": "INPUT_FILE=input_lists/mainnet.json env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
     "deploy-merkle-root:mainnet": "INPUT_FILE=input_lists/mainnet.json DEPLOY=true env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
     "prepublishOnly": "yarn test",
@@ -34,6 +34,7 @@
     "env-cmd": "^10.1.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.774.0",
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@types/chai": "^4.2.6",

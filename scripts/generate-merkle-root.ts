@@ -2,10 +2,43 @@ import fs from 'fs';
 import path from 'path';
 import { parseBalanceMap } from '../src/parse-balance-map';
 import { ethers } from 'hardhat';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 // Get arguments from environment variables instead of command line
 const INPUT_FILE = process.env.INPUT_FILE;
 const DEPLOY = process.env.DEPLOY === 'true';
+
+// S3 configuration
+const S3_BUCKET = process.env.S3_BUCKET;
+const S3_REGION = process.env.S3_REGION || 'us-west-1';
+
+// Create S3 client
+const s3Client = new S3Client({ region: S3_REGION });
+
+// Function to upload JSON to S3
+async function uploadToS3(data: any, key: any) {
+  if (!S3_BUCKET) {
+    throw new Error('S3_BUCKET environment variable must be set for S3 upload');
+  }
+  
+  console.log(`Uploading to S3 bucket ${S3_BUCKET} with key ${key}...`);
+  
+  const params = {
+    Bucket: S3_BUCKET,
+    Key: key,
+    Body: JSON.stringify(data, null, 2),
+    ContentType: 'application/json'
+  };
+  
+  try {
+    const response = await s3Client.send(new PutObjectCommand(params));
+    console.log(`Successfully uploaded to s3://${S3_BUCKET}/${key}`);
+    return response;
+  } catch (error) {
+    console.error('Error uploading to S3:', error);
+    throw error;
+  }
+}
 
 async function main() {
   if (!INPUT_FILE) {
@@ -24,13 +57,23 @@ async function main() {
   console.log('Generating merkle root...');
   const parsedBalances = parseBalanceMap(json);
   console.log('Merkle root generated:', parsedBalances.merkleRoot);
-  console.log(JSON.stringify(parsedBalances, null, 2));
   
-  // Save output to a file
-  const outputFileName = path.basename(INPUT_FILE, path.extname(INPUT_FILE)) + '.merkle.json';
-  const outputPath = path.join(path.dirname(INPUT_FILE), outputFileName);
-  fs.writeFileSync(outputPath, JSON.stringify(parsedBalances, null, 2));
-  console.log(`Merkle distribution data saved to ${outputPath}`);
+  // Generate output file name
+  const baseFileName = path.basename(INPUT_FILE, path.extname(INPUT_FILE));
+  const merkleFileName = `${baseFileName}.merkle.json`;
+  
+  // Save output to S3
+  await uploadToS3(
+    parsedBalances, 
+    `merkle-distributions/${merkleFileName}`
+  );
+  
+  // Still save locally if needed
+  if (process.env.SAVE_LOCAL === 'true') {
+    const outputPath = path.join(path.dirname(INPUT_FILE), merkleFileName);
+    fs.writeFileSync(outputPath, JSON.stringify(parsedBalances, null, 2));
+    console.log(`Merkle distribution data saved locally to ${outputPath}`);
+  }
   
   // Deploy if requested
   if (DEPLOY) {
@@ -78,12 +121,22 @@ async function main() {
       tokenAddress: airdropAsset
     };
     
-    const deploymentPath = path.join(
-      path.dirname(INPUT_FILE), 
-      path.basename(INPUT_FILE, path.extname(INPUT_FILE)) + '.deployment.json'
+    // Upload deployment info to S3
+    const deploymentFileName = `${baseFileName}.deployment.json`;
+    await uploadToS3(
+      deploymentInfo, 
+      `merkle-deployments/${deploymentFileName}`
     );
-    fs.writeFileSync(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
-    console.log(`Deployment information saved to ${deploymentPath}`);
+    
+    // Save locally if needed
+    if (process.env.SAVE_LOCAL === 'true') {
+      const deploymentPath = path.join(
+        path.dirname(INPUT_FILE), 
+        deploymentFileName
+      );
+      fs.writeFileSync(deploymentPath, JSON.stringify(deploymentInfo, null, 2));
+      console.log(`Deployment information saved locally to ${deploymentPath}`);
+    }
   }
 }
 
