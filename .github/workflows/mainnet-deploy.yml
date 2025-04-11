@@ -52,8 +52,8 @@ jobs:
       - run: yarn install --frozen-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::491794280232:role/term-finance-infra
-          role-session-name: term-finance-merkle-distributor-github-workflow
+          role-to-assume: arn:aws:iam::491794280232:role/term-merkle-distributor
+          role-session-name: term-merkle-distributor-github-workflow
           aws-region: us-west-1
       - run: yarn compile
       - uses: actions/download-artifact@v4.1.9
