@@ -1,4 +1,4 @@
-import { solidityPackedKeccak256 } from 'ethers';
+import { solidityPackedKeccak256 } from 'ethers'
 import MerkleTree from './merkle-tree'
 
 export default class BalanceTree {
@@ -7,7 +7,7 @@ export default class BalanceTree {
     this.tree = new MerkleTree(
       balances.map(({ account, amount }, index) => {
         return BalanceTree.toNode(index, account, amount)
-      })
+      }),
     )
   }
 
@@ -16,7 +16,7 @@ export default class BalanceTree {
     account: string,
     amount: bigint,
     proof: Buffer[],
-    root: Buffer
+    root: Buffer,
   ): boolean {
     let pair = BalanceTree.toNode(index, account, amount)
     for (const item of proof) {
@@ -30,7 +30,7 @@ export default class BalanceTree {
   public static toNode(index: number | bigint, account: string, amount: bigint): Buffer {
     return Buffer.from(
       solidityPackedKeccak256(['uint256', 'address', 'uint256'], [index, account, amount]).substr(2),
-      'hex'
+      'hex',
     )
   }
 

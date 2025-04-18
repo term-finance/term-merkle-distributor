@@ -102,12 +102,18 @@ for (const contract of ['MerkleDistributor', 'MerkleDistributorWithDeadline'] as
     describe('#claim', () => {
       it('fails for empty proof', async () => {
         const distributor = await deployContract(distributorFactory, await token.getAddress(), ZERO_BYTES32, contract)
-        await expect(distributor.claim(0, wallet0.address, 10, [])).to.be.revertedWithCustomError(distributor, 'InvalidProof')
+        await expect(distributor.claim(0, wallet0.address, 10, [])).to.be.revertedWithCustomError(
+          distributor,
+          'InvalidProof',
+        )
       })
 
       it('fails for invalid index', async () => {
         const distributor = await deployContract(distributorFactory, await token.getAddress(), ZERO_BYTES32, contract)
-        await expect(distributor.claim(0, wallet0.address, 10, [])).to.be.revertedWithCustomError(distributor, 'InvalidProof')
+        await expect(distributor.claim(0, wallet0.address, 10, [])).to.be.revertedWithCustomError(
+          distributor,
+          'InvalidProof',
+        )
       })
 
       describe('two account tree', () => {

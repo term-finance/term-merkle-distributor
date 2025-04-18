@@ -77,10 +77,7 @@ export function parseBalanceMap(balances: OldFormat | NewFormat[]): MerkleDistri
     return memo
   }, {})
 
-  const tokenTotal: bigint = sortedAddresses.reduce<bigint>(
-    (memo, key) => memo + BigInt(dataByAddress[key].amount),
-    0n,
-  )
+  const tokenTotal: bigint = sortedAddresses.reduce<bigint>((memo, key) => memo + BigInt(dataByAddress[key].amount), 0n)
 
   return {
     merkleRoot: tree.getHexRoot(),
