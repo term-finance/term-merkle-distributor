@@ -1,7 +1,5 @@
-import { BigNumber, utils } from 'ethers'
+import { getAddress, isAddress, toBeHex } from 'ethers'
 import BalanceTree from './balance-tree'
-
-const { isAddress, getAddress } = utils
 
 // This is the blob that gets distributed and pinned to IPFS.
 // It is completely sufficient for recreating the entire merkle tree.
@@ -34,19 +32,19 @@ export function parseBalanceMap(balances: OldFormat | NewFormat[]): MerkleDistri
           address: account,
           earnings: `0x${balances[account].toString(16)}`,
           reasons: '',
-        })
+        }),
       )
 
   const dataByAddress = balancesInNewFormat.reduce<{
-    [address: string]: { amount: BigNumber; flags?: { [flag: string]: boolean } }
+    [address: string]: { amount: bigint; flags?: { [flag: string]: boolean } }
   }>((memo, { address: account, earnings, reasons }) => {
     if (!isAddress(account)) {
       throw new Error(`Found invalid address: ${account}`)
     }
     const parsed = getAddress(account)
     if (memo[parsed]) throw new Error(`Duplicate address: ${parsed}`)
-    const parsedNum = BigNumber.from(earnings)
-    if (parsedNum.lte(0)) throw new Error(`Invalid amount for account: ${account}`)
+    const parsedNum = BigInt(earnings)
+    if (parsedNum <= 0n) throw new Error(`Invalid amount for account: ${account}`)
 
     const flags = {
       isSOCKS: reasons.includes('socks'),
@@ -62,7 +60,7 @@ export function parseBalanceMap(balances: OldFormat | NewFormat[]): MerkleDistri
 
   // construct a tree
   const tree = new BalanceTree(
-    sortedAddresses.map((address) => ({ account: address, amount: dataByAddress[address].amount }))
+    sortedAddresses.map((address) => ({ account: address, amount: dataByAddress[address].amount })),
   )
 
   // generate claims
@@ -72,21 +70,21 @@ export function parseBalanceMap(balances: OldFormat | NewFormat[]): MerkleDistri
     const { amount, flags } = dataByAddress[address]
     memo[address.toLowerCase()] = {
       index,
-      amount: amount.toHexString(),
+      amount: toBeHex(amount),
       proof: tree.getProof(index, address, amount),
       ...(flags ? { flags } : {}),
     }
     return memo
   }, {})
 
-  const tokenTotal: BigNumber = sortedAddresses.reduce<BigNumber>(
-    (memo, key) => memo.add(dataByAddress[key].amount),
-    BigNumber.from(0)
+  const tokenTotal: bigint = sortedAddresses.reduce<bigint>(
+    (memo, key) => memo + BigInt(dataByAddress[key].amount),
+    0n,
   )
 
   return {
     merkleRoot: tree.getHexRoot(),
-    tokenTotal: tokenTotal.toHexString(),
+    tokenTotal: toBeHex(tokenTotal),
     claims,
   }
 }
