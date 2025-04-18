@@ -1,15 +1,15 @@
-name: "[mainnet-manual]: Deploy Merkle Distributor"
+name: '[mainnet-manual]: Deploy Merkle Distributor'
 on:
   workflow_dispatch:
     inputs:
       tokenAddress:
-        description: "Air drop token Address"
+        description: 'Air drop token Address'
         required: true
       endTimeStamp:
-        description: "End Time Stamp"
+        description: 'End Time Stamp'
         required: true
       adminAddress:
-        description: "Admin Address"
+        description: 'Admin Address'
         required: true
 permissions:
   id-token: write
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.20.8"
+          node-version: '18.20.8'
           cache: yarn
       - run: yarn install --frozen-
       - uses: aws-actions/configure-aws-credentials@v4
