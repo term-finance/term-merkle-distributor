@@ -1,7 +1,7 @@
 # @uniswap/merkle-distributor
 
-[![Tests](https://github.com/Uniswap/merkle-distributor/workflows/Tests/badge.svg)](https://github.com/Uniswap/merkle-distributor/actions?query=workflow%3ATests)
-[![Lint](https://github.com/Uniswap/merkle-distributor/workflows/Lint/badge.svg)](https://github.com/Uniswap/merkle-distributor/actions?query=workflow%3ALint)
+[![Tests](https://github.com/term-finance/term-merkle-distributor/workflows/Tests/badge.svg)](https://github.com/term-finance/term-merkle-distributor/actions?query=workflow%3ATests)
+[![Lint](https://github.com/term-finance/term-merkle-distributor/workflows/Lint/badge.svg)](https://github.com/term-finance/term-merkle-distributor/actions?query=workflow%3ALint)
 
 # Local Development
 
