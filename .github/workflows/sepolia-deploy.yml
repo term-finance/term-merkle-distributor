@@ -31,7 +31,7 @@ jobs:
           echo "S3_BUCKET=\"${{ vars.S3_BUCKET }}\"" >> mainnet.env
           echo "S3_REGION=\"${{ vars.S3_REGION }}\"" >> mainnet.env
 
-      - uses: actions/upload-artifact@v4.6.1
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: deploy-sepolia.env
           path: sepolia.env
@@ -69,11 +69,11 @@ jobs:
           echo "Deployed contract:" >> $GITHUB_STEP_SUMMARY
         env:
           OUTPUT_DEPLOY_ENV: term-deploy.env
-      - uses: actions/upload-artifact@v4.6.1
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: abis
           path: abi/
-      - uses: actions/upload-artifact@v4.6.1
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: deployed-sepolia.env
           path: term-deploy.env

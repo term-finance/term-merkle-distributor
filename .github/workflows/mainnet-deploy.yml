@@ -32,7 +32,7 @@ jobs:
           echo "S3_REGION=\"${{ vars.S3_REGION }}\"" >> mainnet.env
           echo "DEPLOY=\"${{ vars.DEPLOY }}\"" >> mainnet.env
 
-      - uses: actions/upload-artifact@v4.6.1
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: deploy-mainnet.env
           path: mainnet.env
@@ -70,11 +70,11 @@ jobs:
           echo "Deployed contract:" >> $GITHUB_STEP_SUMMARY
         env:
           OUTPUT_DEPLOY_ENV: term-deploy.env
-      - uses: actions/upload-artifact@v4.6.1
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: abis
           path: abi/
-      - uses: actions/upload-artifact@v4.6.1
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: deployed-mainnet.env
           path: term-deploy.env
