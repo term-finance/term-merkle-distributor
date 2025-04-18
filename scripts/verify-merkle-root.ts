@@ -1,12 +1,12 @@
 import { program } from 'commander'
+import { solidityPackedKeccak256 } from 'ethers'
 import fs from 'fs'
-import { BigNumber, utils } from 'ethers'
 
 program
   .version('0.0.0')
   .requiredOption(
     '-i, --input <path>',
-    'input JSON file location containing the merkle proofs for each account and the merkle root'
+    'input JSON file location containing the merkle proofs for each account and the merkle root',
   )
 
 program.parse(process.argv)
@@ -21,23 +21,17 @@ const combinedHash = (first: Buffer, second: Buffer): Buffer => {
   }
 
   return Buffer.from(
-    utils.solidityKeccak256(['bytes32', 'bytes32'], [first, second].sort(Buffer.compare)).slice(2),
-    'hex'
+    solidityPackedKeccak256(['bytes32', 'bytes32'], [first, second].sort(Buffer.compare)).slice(2),
+    'hex',
   )
 }
 
-const toNode = (index: number | BigNumber, account: string, amount: BigNumber): Buffer => {
-  const pairHex = utils.solidityKeccak256(['uint256', 'address', 'uint256'], [index, account, amount])
+const toNode = (index: number, account: string, amount: bigint): Buffer => {
+  const pairHex = solidityPackedKeccak256(['uint256', 'address', 'uint256'], [BigInt(index), account, amount])
   return Buffer.from(pairHex.slice(2), 'hex')
 }
 
-const verifyProof = (
-  index: number | BigNumber,
-  account: string,
-  amount: BigNumber,
-  proof: Buffer[],
-  root: Buffer
-): boolean => {
+const verifyProof = (index: number, account: string, amount: bigint, proof: Buffer[], root: Buffer): boolean => {
   let pair = toNode(index, account, amount)
   for (const item of proof) {
     pair = combinedHash(pair, item)
@@ -57,7 +51,7 @@ const getNextLayer = (elements: Buffer[]): Buffer[] => {
   }, [])
 }
 
-const getRoot = (balances: { account: string; amount: BigNumber; index: number }[]): Buffer => {
+const getRoot = (balances: { account: string; amount: bigint; index: number }[]): Buffer => {
   let nodes = balances
     .map(({ account, amount, index }) => toNode(index, account, amount))
     // sort by lexicographical order
@@ -84,13 +78,13 @@ if (typeof json !== 'object') throw new Error('Invalid JSON')
 const merkleRootHex = json.merkleRoot
 const merkleRoot = Buffer.from(merkleRootHex.slice(2), 'hex')
 
-let balances: { index: number; account: string; amount: BigNumber }[] = []
+let balances: { index: number; account: string; amount: bigint }[] = []
 let valid = true
 
 Object.keys(json.claims).forEach((address) => {
   const claim = json.claims[address]
   const proof = claim.proof.map((p: string) => Buffer.from(p.slice(2), 'hex'))
-  balances.push({ index: claim.index, account: address, amount: BigNumber.from(claim.amount) })
+  balances.push({ index: claim.index, account: address, amount: BigInt(claim.amount) })
   if (verifyProof(claim.index, address, claim.amount, proof, merkleRoot)) {
     console.log('Verified proof for', claim.index, address)
   } else {

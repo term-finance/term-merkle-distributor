@@ -36,7 +36,7 @@ async function main() {
         {
           maxBodyLength: Infinity,
           headers: { Authorization: `Bearer ${program.token}`, 'Content-Type': 'application/json' },
-        }
+        },
       )
       .then((response) => {
         if (!response.data.success) {
