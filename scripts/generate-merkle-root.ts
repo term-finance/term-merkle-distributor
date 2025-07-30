@@ -72,51 +72,7 @@ async function main() {
     fs.writeFileSync(outputPath, JSON.stringify(parsedBalances, null, 2))
     console.log(`Merkle distribution data saved locally to ${outputPath}`)
   }
-
-  // Deploy if requested
-  if (DEPLOY) {
-    const airdropAsset = process.env.AIRDROP_ASSET
-    if (!airdropAsset) {
-      console.error('AIRDROP_ASSET environment variable must be set for deployment')
-      return process.exit(1)
-    }
-    const endTimestamp = process.env.END_TIMESTAMP
-    if (!endTimestamp) {
-      console.error('END_TIMESTAMP environment variable must be set for deployment')
-      return process.exit(1)
-    }
-
-    const adminAddress = process.env.ADMIN_ADDRESS
-    if (!adminAddress) {
-      console.error('ADMIN_ADDRESS environment variable must be set for deployment')
-      return process.exit(1)
-    }
-
-    console.log(`Deploying MerkleDistributor with token ${airdropAsset}...`)
-
-    const [deployer] = await hre.ethers.getSigners()
-    console.log(`Deploying with account: ${deployer.address}`)
-
-    const MerkleDistributor = await hre.ethers.getContractFactory('MerkleDistributorWithDeadline')
-    const merkleDistributor = await MerkleDistributor.deploy(airdropAsset, parsedBalances.merkleRoot, endTimestamp)
-
-    console.log(`MerkleDistributor deployed at ${await merkleDistributor.getAddress()}`)
-    await merkleDistributor.transferOwnership(adminAddress)
-    console.log(`Ownership transferred to ${adminAddress}`)
-
-    // Save deployment information
-    const deploymentInfo = {
-      merkleRoot: parsedBalances.merkleRoot,
-      contractAddress: await merkleDistributor.getAddress(),
-      deploymentNetwork: (await hre.ethers.provider.getNetwork()).name,
-      deploymentTime: new Date().toISOString(),
-      tokenAddress: airdropAsset,
-    }
-
-    // Upload deployment info to S3
-    const deploymentFileName = `${baseFileName}.deployment.json`
-    await uploadToS3(deploymentInfo, `merkle-deployments/${deploymentFileName}`)
-  }
+  
 }
 
 // Execute the script
