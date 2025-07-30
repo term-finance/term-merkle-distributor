@@ -72,7 +72,6 @@ async function main() {
     fs.writeFileSync(outputPath, JSON.stringify(parsedBalances, null, 2))
     console.log(`Merkle distribution data saved locally to ${outputPath}`)
   }
-  
 }
 
 // Execute the script
