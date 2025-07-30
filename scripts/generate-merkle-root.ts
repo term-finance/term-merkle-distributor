@@ -54,7 +54,7 @@ async function main() {
     throw new Error('Invalid JSON format')
   }
 
-  // Generate the merkle root
+  // Generate the merkle roo
   console.log('Generating merkle root...')
   const parsedBalances = parseBalanceMap(json)
   console.log('Merkle root generated:', parsedBalances.merkleRoot)

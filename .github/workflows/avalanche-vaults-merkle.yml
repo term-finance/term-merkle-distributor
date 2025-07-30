@@ -23,14 +23,11 @@ jobs:
       url: https://term-finance.github.io/term-merkle-distributor/
     steps:
       - run: |
-          echo "AVALANCHE_VAULTS_RPC_URL=\"${{ secrets.AVALANCHE_VAULTS_RPC_URL }}\"" >> avalanche.env
-          echo "PRIVATE_KEY=\"${{ secrets.PRIVATE_KEY }}\"" >> avalanche.env
           echo "AIRDROP_ASSET=\"${{ github.event.inputs.tokenAddress }}\"" >> avalanche.env
           echo "END_TIMESTAMP=\"${{ github.event.inputs.endTimeStamp }}\"" >> avalanche.env
           echo "ADMIN_ADDRESS=\"${{ github.event.inputs.adminAddress }}\"" >> avalanche.env
           echo "S3_BUCKET=\"${{ vars.S3_BUCKET }}\"" >> avalanche.env
           echo "S3_REGION=\"${{ vars.S3_REGION }}\"" >> avalanche.env
-          echo "DEPLOY=\"${{ vars.DEPLOY }}\"" >> avalanche.env
 
       - uses: actions/upload-artifact@v4.6.2
         with:
