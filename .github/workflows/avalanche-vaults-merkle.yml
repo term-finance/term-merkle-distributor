@@ -19,7 +19,7 @@ jobs:
   deploy-config:
     runs-on: ubuntu-latest
     environment:
-      name: mainnet
+      name: avalanche
       url: https://term-finance.github.io/term-merkle-distributor/
     steps:
       - run: |
@@ -36,7 +36,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: mainnet
+      name: avalanche
       url: https://term-finance.github.io/term-merkle-distributor/
     needs: deploy-config
 
