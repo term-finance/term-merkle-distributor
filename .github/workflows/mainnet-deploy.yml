@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: '18.20.8'
           cache: yarn
-      - run: yarn install --frozen-
+      - run: yarn install --frozen-lockfile
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::491794280232:role/term-merkle-distributor
