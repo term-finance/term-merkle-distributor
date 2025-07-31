@@ -34,6 +34,10 @@ const config: HardhatUserConfig = {
       url: process.env.SEPOLIA_RPC_URL || 'https://sepolia.infura.io/v3/your-api-key',
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
+    avalanche: {
+      url: process.env.AVALANCHE_RPC_URL || 'https://avalanche.infura.io/v3/your-api-key',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
   },
 }
 
