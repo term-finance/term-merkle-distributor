@@ -60,7 +60,7 @@ jobs:
       - run: mv /tmp/deploy-avalanche.env/avalanche.env avalanche.env
 
       - run: |
-          yarn deploy-merkle-root:avalanche-vaults
+          yarn generate-merkle-root:avalanche-vaults
           echo "Deployed contract using:" >> $GITHUB_STEP_SUMMARY
           cat "avalanche.env" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
