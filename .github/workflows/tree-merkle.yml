@@ -1,0 +1,77 @@
+name: '[mainnet-manual]: Deploy Merkle Distributor for TREE'
+on:
+  workflow_dispatch:
+    inputs:
+      tokenAddress:
+        description: 'Air drop token Address'
+        required: true
+      endTimeStamp:
+        description: 'End Time Stamp'
+        required: true
+      adminAddress:
+        description: 'Admin Address'
+        required: true
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-config:
+    runs-on: ubuntu-latest
+    environment:
+      name: mainnet
+      url: https://term-finance.github.io/term-merkle-distributor/
+    steps:
+      - run: |
+          echo "AIRDROP_ASSET=\"${{ github.event.inputs.tokenAddress }}\"" >> mainnet.env
+          echo "END_TIMESTAMP=\"${{ github.event.inputs.endTimeStamp }}\"" >> mainnet.env
+          echo "ADMIN_ADDRESS=\"${{ github.event.inputs.adminAddress }}\"" >> mainnet.env
+          echo "S3_BUCKET=\"${{ vars.S3_BUCKET }}\"" >> mainnet.env
+          echo "S3_REGION=\"${{ vars.S3_REGION }}\"" >> mainnet.env
+
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          name: deploy-mainnet.env
+          path: mainnet.env
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: mainnet
+      url: https://term-finance.github.io/term-merkle-distributor/
+    needs: deploy-config
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.20.8'
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::491794280232:role/term-merkle-distributor
+          role-session-name: term-merkle-distributor-github-workflow
+          aws-region: us-west-1
+      - run: yarn compile
+      - uses: actions/download-artifact@v4.2.1
+        with:
+          name: deploy-mainnet.env
+          path: /tmp/deploy-mainnet.env
+      - run: mv /tmp/deploy-mainnet.env/mainnet.env mainnet.env
+
+      - run: |
+          yarn generate-merkle-root:tree
+          echo "Deployed contract using:" >> $GITHUB_STEP_SUMMARY
+          cat "avalanche.env" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed contract:" >> $GITHUB_STEP_SUMMARY
+        env:
+          OUTPUT_DEPLOY_ENV: term-deploy.env
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          name: abis
+          path: abi/
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          name: deployed-mainnet.env
+          path: term-deploy.env

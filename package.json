@@ -25,6 +25,7 @@
     "deploy-merkle-root:sepolia": "INPUT_FILE=input_lists/sepolia.json DEPLOY=true env-cmd -f sepolia.env hardhat run --network sepolia scripts/generate-merkle-root.ts",
     "generate-merkle-root:avalanche-vaults": "INPUT_FILE=input_lists/avalanche_vault.json env-cmd -f avalanche.env hardhat run --network avalanche scripts/generate-merkle-root.ts",
     "generate-merkle-root:mainnet": "INPUT_FILE=input_lists/mainnet.json env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
+    "generate-merkle-root:mainnet": "INPUT_FILE=input_lists/tree.json env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
     "deploy-merkle-root:mainnet": "INPUT_FILE=input_lists/mainnet.json DEPLOY=true env-cmd -f mainnet.env hardhat run --network mainnet scripts/generate-merkle-root.ts",
     "prepublishOnly": "yarn test",
     "pretest": "yarn compile",
