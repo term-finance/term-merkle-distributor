@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import type { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import '@nomicfoundation/hardhat-ethers'
+import '@nomicfoundation/hardhat-verify'
 
 dotenv.config()
 
@@ -18,6 +19,12 @@ const config: HardhatUserConfig = {
         },
       },
     ],
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  sourcify: {
+    enabled: true,
   },
   networks: {
     hardhat: {},
