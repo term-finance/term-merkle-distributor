@@ -45,6 +45,10 @@ const config: HardhatUserConfig = {
       url: process.env.AVALANCHE_RPC_URL || 'https://avalanche.infura.io/v3/your-api-key',
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
+    plasma: {
+      url: process.env.PLASMA_RPC_URL || 'https://plasma.infura.io/v3/your-api-key',
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
   },
 }
 
