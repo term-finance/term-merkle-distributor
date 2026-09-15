@@ -1,0 +1,19 @@
+# Foundry configuration scoped to the Halmos proof suite.
+#
+# This repository builds and tests with Hardhat. Foundry is here only so Halmos
+# has a standard layout to compile from, kept out of Hardhat's way: `cache_path`
+# must not be Foundry's default `cache`, which is also Hardhat's cache directory.
+[profile.default]
+src = "halmos"
+test = "halmos"
+out = "out"
+cache_path = "cache_forge"
+libs = ["node_modules"]
+solc = "0.8.17"
+evm_version = "paris"
+optimizer = true
+optimizer_runs = 5000
+remappings = ["@openzeppelin/=node_modules/@openzeppelin/"]
+# Forge 1.8 links tests dynamically by default, which turns `new` into a deployCode cheatcode
+# halmos 0.3.3 cannot execute.
+dynamic_test_linking = false
