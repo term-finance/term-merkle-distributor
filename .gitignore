@@ -8,3 +8,7 @@ cache/
 /flattened/
 /package/
 /.yarn/install-state.gz
+
+# Foundry (Halmos proofs only)
+out/
+cache_forge/

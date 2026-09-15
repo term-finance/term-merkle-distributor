@@ -1,0 +1,59 @@
+name: Halmos
+
+# Symbolic proofs of the Merkle distributors' claim properties (halmos/).
+on:
+  pull_request:
+  push:
+    branches: [master]
+    paths:
+      - 'contracts/**'
+      - 'halmos/**'
+      - 'foundry.toml'
+      # The proofs compile against OpenZeppelin from node_modules.
+      - 'package.json'
+      - '.yarnrc.yml'
+      - '.yarn/releases/**'
+      - 'yarn.lock'
+      - '.tool-versions'
+      - '.github/workflows/halmos.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  proofs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Dependency lifecycle scripts run in this job; they get no Git credential.
+          persist-credentials: false
+      - id: nodeversion
+        run: echo "version=$(grep nodejs .tool-versions | sed -e 's/[^[:space:]]*[[:space:]]*//')" >> $GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.nodeversion.outputs.version }}
+          cache: yarn
+      # The proofs import OpenZeppelin through foundry.toml's node_modules remapping.
+      - run: yarn install --immutable
+      # This repository's allowed actions do not include foundry-rs/foundry-toolchain, so forge
+      # comes from its release archive, checked against the digest GitHub publishes for it.
+      - name: Install Foundry
+        env:
+          FOUNDRY_VERSION: v1.7.1
+          FOUNDRY_SHA256: cf7e688ed0c4c48adffca788b496076e31060b67ac5afe1e43dbb5499c20c88b
+        run: |
+          archive="$RUNNER_TEMP/foundry.tar.gz"
+          curl -fsSL -o "$archive" "https://github.com/foundry-rs/foundry/releases/download/${FOUNDRY_VERSION}/foundry_${FOUNDRY_VERSION}_linux_amd64.tar.gz"
+          echo "${FOUNDRY_SHA256}  ${archive}" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/foundry"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/foundry"
+          echo "$RUNNER_TEMP/foundry" >> "$GITHUB_PATH"
+      - run: forge --version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install halmos==0.3.3
+      # A solver that gives up reports TIMEOUT, which halmos counts as a failed proof, so the job
+      # fails rather than passing; the finite limit keeps it from running indefinitely instead.
+      - run: halmos --contract MerkleDistributorProofs --solver-timeout-assertion 5m -st
