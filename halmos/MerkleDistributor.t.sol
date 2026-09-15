@@ -168,8 +168,9 @@ contract MerkleDistributorProofs {
         assert(token.balanceOf(address(distributor)) == funded);
     }
 
-    /// @notice Not even the owner can withdraw while claims are still open.
-    function check_noWithdrawDuringTheClaimWindow(uint256 endTime, uint256 at, uint256 funded) public {
+    /// @notice Not even the owner can withdraw before the deadline. At the deadline itself the
+    ///         owner can, while claims still pay: see the finding below.
+    function check_noWithdrawBeforeTheDeadline(uint256 endTime, uint256 at, uint256 funded) public {
         vm.assume(endTime > block.timestamp && at < endTime);
         (MerkleDistributorWithDeadline distributor, BalanceTokenStub token) = _deployFunded(endTime, funded);
         vm.warp(at);
@@ -178,6 +179,30 @@ contract MerkleDistributorProofs {
         } catch {}
         assert(token.transfers() == 0);
         assert(token.balanceOf(address(distributor)) == funded);
+    }
+
+    /// @notice FINDING: the deadline second belongs to both windows. At `block.timestamp == endTime`,
+    ///         `claim` still pays (it refuses only after endTime) and `withdraw` already succeeds (it
+    ///         refuses only before endTime). The owner can therefore sweep the remainder in the same
+    ///         block as claims that are still valid, which then fail for want of tokens.
+    function check_FINDING_ownerCanSweepWhileClaimsStillPay(uint256 endTime, uint256 index, address account, uint256 amount)
+        public
+    {
+        vm.assume(endTime > block.timestamp && amount > 0 && account != address(this));
+        BalanceTokenStub token = new BalanceTokenStub();
+        MerkleDistributorWithDeadline distributor =
+            new MerkleDistributorWithDeadline(address(token), _leaf(index, account, amount), endTime);
+        token.mint(address(distributor), amount);
+        vm.warp(endTime);
+
+        distributor.withdraw();
+        assert(token.balanceOf(address(this)) == amount);
+
+        // The claim is inside its window, so only the missing tokens refuse it.
+        try distributor.claim(index, account, amount, noProof) {
+            assert(false);
+        } catch {}
+        assert(!distributor.isClaimed(index) && token.balanceOf(account) == 0);
     }
 
     /// @notice Once the window closes, the owner withdraws the whole remainder, whatever it is.
