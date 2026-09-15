@@ -11,6 +11,8 @@ on:
       - 'foundry.toml'
       # The proofs compile against OpenZeppelin from node_modules.
       - 'package.json'
+      - '.yarnrc.yml'
+      - '.yarn/releases/**'
       - 'yarn.lock'
       - '.tool-versions'
       - '.github/workflows/halmos.yml'
@@ -52,6 +54,6 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install halmos==0.3.3
-      # `--solver-timeout-assertion 0` disables the per-assertion timeout: a solver
-      # that gives up must fail the job, never quietly report a pass.
-      - run: halmos --contract MerkleDistributorProofs --solver-timeout-assertion 0 -st
+      # A solver that gives up reports TIMEOUT, which halmos counts as a failed proof, so the job
+      # fails rather than passing; the finite limit keeps it from running indefinitely instead.
+      - run: halmos --contract MerkleDistributorProofs --solver-timeout-assertion 5m -st

@@ -9,8 +9,10 @@ test = "halmos"
 out = "out"
 cache_path = "cache_forge"
 libs = ["node_modules"]
-solc = "0.8.17"
-evm_version = "paris"
+solc_version = "0.8.17"
+# The newest EVM version solc 0.8.17 knows, and the one hardhat.config.ts compiles for, since it
+# sets none. Paris needs solc 0.8.18.
+evm_version = "london"
 optimizer = true
 optimizer_runs = 5000
 remappings = ["@openzeppelin/=node_modules/@openzeppelin/"]
