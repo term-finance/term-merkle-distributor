@@ -181,33 +181,44 @@ contract MerkleDistributorProofs {
         assert(token.balanceOf(address(distributor)) == funded);
     }
 
+    function _deployFundedFor(uint256 endTime, uint256 index, address account, uint256 amount)
+        internal
+        returns (MerkleDistributorWithDeadline distributor, BalanceTokenStub token)
+    {
+        token = new BalanceTokenStub();
+        distributor = new MerkleDistributorWithDeadline(address(token), _leaf(index, account, amount), endTime);
+        token.mint(address(distributor), amount);
+    }
+
     /// @notice FINDING: the deadline second belongs to both windows. At `block.timestamp == endTime`,
     ///         `claim` still pays (it refuses only after endTime) and `withdraw` already succeeds (it
     ///         refuses only before endTime). The owner can therefore sweep the remainder in the same
-    ///         block as claims that are still valid, which then fail for want of tokens.
+    ///         block as claims that are still valid, which then fail for want of tokens. Shown on two
+    ///         identically funded distributors at the same second, so neither result depends on the
+    ///         other having run first.
     function check_FINDING_ownerCanSweepWhileClaimsStillPay(uint256 endTime, uint256 index, address account, uint256 amount)
         public
     {
         vm.assume(endTime > block.timestamp && amount > 0 && account != address(this));
-        BalanceTokenStub token = new BalanceTokenStub();
-        MerkleDistributorWithDeadline distributor =
-            new MerkleDistributorWithDeadline(address(token), _leaf(index, account, amount), endTime);
-        token.mint(address(distributor), amount);
+        (MerkleDistributorWithDeadline claimable, BalanceTokenStub claimToken) = _deployFundedFor(endTime, index, account, amount);
+        (MerkleDistributorWithDeadline sweepable, BalanceTokenStub sweepToken) = _deployFundedFor(endTime, index, account, amount);
         vm.warp(endTime);
 
-        (bool swept, ) = address(distributor).call(abi.encodeCall(MerkleDistributorWithDeadline.withdraw, ()));
-        assert(swept && token.balanceOf(address(this)) == amount);
+        // A valid claim still pays at this second...
+        (bool claimed, ) =
+            address(claimable).call(abi.encodeCall(MerkleDistributorWithDeadline.claim, (index, account, amount, noProof)));
+        assert(claimed && claimable.isClaimed(index));
 
-        // The claim is inside its window, so only the missing tokens refuse it.
-        try distributor.claim(index, account, amount, noProof) {
-            assert(false);
-        } catch {}
-        assert(!distributor.isClaimed(index) && token.balanceOf(account) == 0);
+        // ...and the owner can already take everything that claim is paid from.
+        (bool swept, ) = address(sweepable).call(abi.encodeCall(MerkleDistributorWithDeadline.withdraw, ()));
+        assert(swept && sweepToken.balanceOf(address(sweepable)) == 0 && sweepToken.balanceOf(address(this)) == amount);
+        claimToken;
     }
 
-    /// @notice Once the window closes, the owner withdraws the whole remainder, whatever it is.
+    /// @notice After the deadline, the owner withdraws the whole remainder, whatever it is. The deadline
+    ///         second itself is the finding above.
     function check_ownerWithdrawsTheRemainderAfterTheDeadline(uint256 endTime, uint256 later, uint256 funded) public {
-        vm.assume(endTime > block.timestamp && later >= endTime);
+        vm.assume(endTime > block.timestamp && later > endTime);
         (MerkleDistributorWithDeadline distributor, BalanceTokenStub token) = _deployFunded(endTime, funded);
         vm.warp(later);
         distributor.withdraw();
