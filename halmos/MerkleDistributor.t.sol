@@ -195,8 +195,8 @@ contract MerkleDistributorProofs {
         token.mint(address(distributor), amount);
         vm.warp(endTime);
 
-        distributor.withdraw();
-        assert(token.balanceOf(address(this)) == amount);
+        (bool swept, ) = address(distributor).call(abi.encodeCall(MerkleDistributorWithDeadline.withdraw, ()));
+        assert(swept && token.balanceOf(address(this)) == amount);
 
         // The claim is inside its window, so only the missing tokens refuse it.
         try distributor.claim(index, account, amount, noProof) {
