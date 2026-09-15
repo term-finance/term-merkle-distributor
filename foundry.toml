@@ -16,6 +16,6 @@ evm_version = "london"
 optimizer = true
 optimizer_runs = 5000
 remappings = ["@openzeppelin/=node_modules/@openzeppelin/"]
-# Forge 1.8 links tests dynamically by default, which turns `new` into a deployCode cheatcode
-# halmos 0.3.3 cannot execute.
+# Newer forge releases link tests dynamically by default, which turns `new` into a deployCode
+# cheatcode halmos 0.3.3 cannot execute. Stated here so a forge upgrade does not change it.
 dynamic_test_linking = false
